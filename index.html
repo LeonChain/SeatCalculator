@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="assets/js/money.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="assets/css/theme.css" rel="stylesheet" />
+    <link href="assets/css/custom.css" rel="stylesheet" />
+    <link
+      href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+      rel="stylesheet"
+    />
+    <style>
+      input {
+        margin-left: 0px;
+        width: 100%;
+        background: #ffffff url(/images/input-bg.png) no-repeat scroll 0 0;
+        border: 1px solid #bbbbbb;
+        border-radius: 2px;
+        color: #999999;
+        font: 12px/18px Helvetica Neue, "Arial", Helvetica, Verdana, sans-serif;
+        margin: 5px;
+        padding: 5px 4px;
+        position: relative;
+        text-shadow: 0 0 1px #ffffff;
+      }
+
+      #pricingcalculator {
+        width: 50%;
+        margin: auto;
+      }
+
+      body {
+        background-color: #ffffff !important;
+      }
+
+      select.form {
+        background: #ffffff url(/images/input-bg.png) no-repeat scroll 0 0;
+        border: 1px solid #bbbbbb;
+        border-radius: 2px;
+        color: #999999;
+        font: 12px/18px Helvetica Neue, "Arial", Helvetica, Verdana, sans-serif;
+        margin: 5px;
+        padding: 5px 4px;
+        position: relative;
+        text-shadow: 0 0 1px #ffffff;
+      }
+
+      ul li.nav-item:focus {
+        background-color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pricingcalculator">
+      <ul class="nav justify-content-center">
+        <li class="nav-item">
+          <a class="nav-link active" href="#single_calc" data-toggle="tab">
+            <label>
+              <span>
+                <i class="fa fa-code"></i>
+              </span>
+              Single
+              <span>
+                Company
+              </span>
+            </label>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#multiple_calc" data-toggle="tab">
+            <label>
+              <span>
+                <i class="fa fa-pencil-square-o"></i>
+              </span>
+              Multi-
+              <span>
+                Client
+              </span>
+            </label>
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content clearfix">
+        <section id="single_calc" class="tab-pane active col-xs-12">
+          <iframe
+            src="single.html"
+            scrolling="no"
+            style="width: 100%; height: 600px; border: 0px solid white;"
+          ></iframe>
+        </section>
+
+        <section id="multiple_calc" class="tab-pane col-xs-12">
+          <iframe
+            src="multi.html"
+            scrolling="no"
+            style="width: 100%; height: 600px; border: 0px solid white;"
+          ></iframe>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

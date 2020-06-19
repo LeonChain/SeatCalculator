@@ -1,0 +1,938 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="assets/js/money.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="assets/css/theme.css" rel="stylesheet" />
+    <link href="assets/css/custom.css" rel="stylesheet" />
+    <style></style>
+  </head>
+
+  <body style="background-color: white !important;">
+    <div
+      class="box-border box-padding box-border-radius box-margin-top"
+      style="padding-right: 0px;"
+    >
+      <script type="text/javascript">
+        $(document).ready(function () {
+          $.getJSON(
+            "https://api.exchangeratesapi.io/latest?base=USD",
+            function (data) {
+              const ordered = {};
+              Object.keys(data.rates)
+                .sort()
+                .forEach(function (key) {
+                  ordered[key] = data.rates[key];
+                });
+
+              data.rates = ordered;
+
+              if (typeof window.fx !== "undefined" && window.fx.rates) {
+                window.fx.rates = data.rates;
+                window.fx.base = data.base;
+              } else {
+                // If not, apply to fxSetup global:
+                var fxSetup = {
+                  rates: data.rates,
+                  base: data.base,
+                };
+              }
+
+              if (data) {
+                $.each(data.rates, function (i, v) {
+                  $("#currency").append(
+                    '<option value="' +
+                      i +
+                      '"' +
+                      (i == "USD" ? " selected" : "") +
+                      ">" +
+                      i +
+                      " " +
+                      symbols[i][0] +
+                      "</option>"
+                  );
+                });
+
+                $("#currency").css("display", "block");
+                setupPricing();
+              }
+            }
+          );
+
+          var main_plans = ["plan_EkFv1uAUfbBy8h"]; // List of Strip plan IDs
+          var one_use_tiers = {};
+          var single_tiers_yearly = (one_use_tier_yearly = [
+            {
+              rangeStart: 26,
+              rangeEnd: 50,
+              unitPrice: 1.3,
+            },
+            {
+              rangeStart: 51,
+              rangeEnd: 100,
+              unitPrice: 1.1,
+            },
+            {
+              rangeStart: 101,
+              rangeEnd: 250,
+              unitPrice: 0.9,
+            },
+            {
+              rangeStart: 251,
+              rangeEnd: 500,
+              unitPrice: 0.7,
+            },
+            {
+              rangeStart: 501,
+              rangeEnd: 1000,
+              unitPrice: 0.6,
+            },
+            {
+              rangeStart: 1001,
+              rangeEnd: 2000,
+              unitPrice: 0.65,
+            },
+            {
+              rangeStart: 2001,
+              rangeEnd: 5000,
+              unitPrice: 0.5,
+            },
+            {
+              rangeStart: 5001,
+              rangeEnd: 10000,
+              unitPrice: 0.35,
+            },
+            {
+              rangeStart: 10001,
+              rangeEnd: "+",
+              unitPrice: 0.3,
+            },
+          ]); // Yearlt Single Client plan
+          var single_tiers_monthly = (one_use_tier_monthly = [
+            {
+              rangeStart: 26,
+              rangeEnd: 50,
+              unitPrice: 1.3,
+            },
+            {
+              rangeStart: 51,
+              rangeEnd: 100,
+              unitPrice: 1.1,
+            },
+            {
+              rangeStart: 101,
+              rangeEnd: 250,
+              unitPrice: 0.9,
+            },
+            {
+              rangeStart: 251,
+              rangeEnd: 500,
+              unitPrice: 0.7,
+            },
+            {
+              rangeStart: 501,
+              rangeEnd: 1000,
+              unitPrice: 0.6,
+            },
+            {
+              rangeStart: 1001,
+              rangeEnd: 2000,
+              unitPrice: 0.65,
+            },
+            {
+              rangeStart: 2001,
+              rangeEnd: 5000,
+              unitPrice: 0.5,
+            },
+            {
+              rangeStart: 5001,
+              rangeEnd: 10000,
+              unitPrice: 0.35,
+            },
+            {
+              rangeStart: 10001,
+              rangeEnd: "+",
+              unitPrice: 0.3,
+            },
+          ]); // Monthly Single Client plan
+          var multi_tiers_yearly = [
+            {
+              rangeStart: 6001,
+              rangeEnd: 15000,
+              unitPrice: 0.03,
+            },
+            {
+              rangeStart: 15001,
+              rangeEnd: 45000,
+              unitPrice: 0.02,
+            },
+            {
+              rangeStart: 45001,
+              rangeEnd: "+",
+              unitPrice: 0.01,
+            },
+          ]; // Yearly Multi Client plan
+          var multi_tiers_monthly = [
+            {
+              rangeStart: 6001,
+              rangeEnd: 15000,
+              unitPrice: 0.03,
+            },
+            {
+              rangeStart: 15001,
+              rangeEnd: 45000,
+              unitPrice: 0.02,
+            },
+            {
+              rangeStart: 45001,
+              rangeEnd: "+",
+              unitPrice: 0.01,
+            },
+          ]; // Monthly Multi Client plan
+
+          var symbols = {
+            AUD: ["A$", 1],
+            BGN: ["leva", 0],
+            BRL: ["R$", 1],
+            CAD: ["CA$", 1],
+            CHF: ["CHF", 0],
+            CNY: ["¥", 1],
+            CZK: ["Kč", 0],
+            DKK: ["kr", 0],
+            EUR: ["€", 1],
+            GBP: ["£", 1],
+            HKD: ["HK$", 1],
+            HRK: ["kn", 0],
+            HUF: ["Ft", 0],
+            IDR: ["Rp", 0],
+            ILS: ["₪", 1],
+            INR: ["₹", 1],
+            ISK: ["kr", 0],
+            JPY: ["¥", 1],
+            KRW: ["₩", 1],
+            MXN: ["MX$", 1],
+            MYR: ["RM", 0],
+            NOK: ["kr", 0],
+            NZD: ["NZ$", 1],
+            PHP: ["₱", 1],
+            PLN: ["zł", 0],
+            RON: ["lei", 0],
+            RUB: ["₽", 0],
+            SEK: ["kr", 0],
+            SGD: ["S$", 1],
+            THB: ["฿", 1],
+            TRY: ["₺", 1],
+            USD: ["$", 1],
+            ZAR: ["R", 0],
+          }; // Array of foreign monitary symbols and placement rules (0 => after numbers, 1 => before numbers)
+
+          /*
+           * Translates a dollar amount into human readable format
+           * amount => number
+           * translate => translate the amount into foreign currency
+           */
+          function monitize(amount, translate = true) {
+            var symbol = "$";
+            var before = 1;
+            var cur = "USD";
+            var str = "";
+
+            if (translate) {
+              if ($("#currency").length) {
+                //only attempt to translate if currency drop down present on page
+                symbol = symbols[$("#currency").val()][0]
+                  ? symbols[$("#currency").val()][0]
+                  : "$";
+                before = symbols[$("#currency").val()][1]
+                  ? symbols[$("#currency").val()][1]
+                  : 1;
+                cur = $("#currency").val();
+              }
+            }
+
+            amount = window.fx(amount).from("USD").to(cur);
+            str =
+              (before == 1 ? symbol : "") +
+              amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") +
+              (before == 1 ? "" : " " + symbol);
+
+            return str;
+          }
+
+          /*
+           * Formats an integer to have commas
+           * amount => number
+           */
+          function formatInt(amount) {
+            return amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+          }
+
+          /*
+           * Calculates the tiered pricing for the main subscription plan using the tiered plans based on account type and billing interval
+           * amount => number of units
+           */
+          function calculateTieredCost(
+            amount,
+            license_type = "single",
+            interval_type = "yearly",
+            amount_off = 0,
+            percent_off = 0
+          ) {
+            var min = 0;
+            var base = 0;
+            var tier = null;
+
+            switch (license_type) {
+              case "one_use":
+              case "single":
+                //base = 500;
+                min = 25;
+                if ($(".unit_name").length) {
+                  //only change if unit_name class is present on page
+                  $(".unit_name").html("seat");
+                }
+
+                $("#span_per_year").hide();
+
+                if (interval_type == "monthly") {
+                  tier = single_tiers_monthly;
+                  base = 50;
+                } else {
+                  tier = single_tiers_yearly;
+                  //base = 500;
+                  base = 50 * 12;
+                }
+                break;
+              case "multi":
+                //base = 1650;
+                min = 6000;
+                if ($(".unit_name").length) {
+                  //only change if unit_name class is present on page
+                  $(".unit_name").html("target email");
+                }
+
+                $("#span_per_year").show();
+
+                if (interval_type == "monthly") {
+                  tier = multi_tiers_monthly;
+                  base = 288;
+                } else {
+                  tier = multi_tiers_yearly;
+                  //base = 2880;
+                  base = 288 * 12;
+                }
+                break;
+            }
+
+            var total = base;
+
+            if (amount - min < 0) {
+              num = amount;
+              amount = 0;
+            } else {
+              num = min;
+              amount = amount - min;
+            }
+
+            $.each(tier, function (i, v) {
+              var num = 0;
+
+              if (v.rangeEnd != "+") {
+                var diff = v.rangeEnd - v.rangeStart + 1;
+                if (amount - diff < 0) {
+                  num = amount;
+                  amount = 0;
+                } else {
+                  num = diff;
+                  amount = amount - diff;
+                }
+              } else {
+                num = amount;
+                amount = 0;
+              }
+
+              total = total + v.unitPrice * num;
+            });
+
+            total = total - amount_off;
+            total = total - (total * (percent_off / 100)).toFixed(2);
+            return total;
+          }
+
+          function setupPricing() {
+            $("#target_emails").val(
+              Math.ceil($("#target_emails").val() / 500) * 500
+            );
+            var amount = 0;
+            var total_amount = 0; //used to make average calculation
+            var min = 0;
+            var base = 0;
+            var tier = null;
+            var license_type = $(
+              'input[name="account_license_type"]:checked'
+            ).val();
+            var interval_type = $(
+              'input[name="account_interval"]:checked'
+            ).val();
+            $("#plan_tier_table").html("");
+
+            if (interval_type == "monthly") {
+              $("#save20").show();
+            } else {
+              $("#save20").hide();
+            }
+
+            switch (license_type) {
+              case "single":
+                $("#span_per_year").hide();
+                amount = $("#number_seats").val();
+                total_amount = $("#number_seats").val();
+                min = 25;
+                $(".unit_name").html("seat");
+                if (interval_type == "monthly") {
+                  tier = single_tiers_monthly;
+                  base = 50;
+                } else {
+                  tier = single_tiers_yearly;
+                  //base = 500;
+                  base = 600;
+                }
+                break;
+              case "multi":
+                $("#span_per_year").show();
+                amount = $("#target_emails").val();
+                total_amount = $("#target_emails").val();
+                min = 6000;
+                $(".unit_name").html("target email");
+                if (interval_type == "monthly") {
+                  tier = multi_tiers_monthly;
+                  base = 288;
+                  //base = 300 * 0.8;
+                } else {
+                  tier = multi_tiers_yearly;
+                  base = 2880;
+                  //base = 3000 * 0.8;
+                }
+                break;
+            }
+
+            if (interval_type == "monthly") {
+              $(".interval_disp").html("/month");
+            } else {
+              $(".interval_disp").html("/year");
+            }
+
+            var total = base;
+            var main_total = 0;
+
+            if (amount - min < 0) {
+              num = amount;
+              amount = 0;
+            } else {
+              num = min;
+              amount = amount - min;
+            }
+
+            var start = window.fx(base).from("USD").to($("#currency").val());
+            $("#plan_tier_table").append(
+              '<tr style="background-color:#fffbcc"><td>1-' +
+                min +
+                '</td><td align="right">-</td><td align="left">x ' +
+                num +
+                '</td><td></td><td align="right">' +
+                monitize(start) +
+                "</td></tr>"
+            );
+
+            $.each(tier, function (i, v) {
+              var num = 0;
+              var call_flag = 0;
+
+              if (v.rangeEnd != "+") {
+                var diff = v.rangeEnd - v.rangeStart + 1;
+                if (amount - diff < 0) {
+                  num = amount;
+                  amount = 0;
+                } else {
+                  num = diff;
+                  amount = amount - diff;
+                }
+              } else {
+                num = amount;
+                amount = 0;
+
+                if (license_type == "single") {
+                  call_flag = 1;
+                  num = 0;
+                }
+              }
+
+              if (interval_type == "yearly")
+                total = total + v.unitPrice * num * 12;
+              else total = total + v.unitPrice * num;
+
+              main_total = total;
+
+              if (call_flag) {
+                $("#plan_tier_table").append(
+                  "<tr" +
+                    (num != 0 ? ' style="background-color:#fffbcc"' : "") +
+                    "><td>" +
+                    (v.rangeEnd == "+"
+                      ? v.rangeStart + "+"
+                      : v.rangeStart + "-" + v.rangeEnd) +
+                    '</td><td align="right" colspan="4">Call for Custom Pricing</td></tr>'
+                );
+              } else {
+                $("#plan_tier_table").append(
+                  "<tr" +
+                    (num != 0 ? ' style="background-color:#fffbcc"' : "") +
+                    "><td>" +
+                    (v.rangeEnd == "+"
+                      ? v.rangeStart + "+"
+                      : v.rangeStart + "-" + v.rangeEnd) +
+                    '</td><td align="right">' +
+                    monitize(v.unitPrice) +
+                    '</td><td align="left">x ' +
+                    formatInt(num) +
+                    '</td><td align="right" style="border-bottom: 1px solid #aaa">+</td><td align="right" style="border-bottom: 1px solid #aaa">' +
+                    (interval_type == "yearly"
+                      ? monitize(v.unitPrice * num * 12)
+                      : monitize(v.unitPrice * num)) +
+                    "</td></tr>"
+                );
+              }
+            });
+            if (interval_type != "monthly") {
+              main_total = truncateDecimals(main_total * 0.8, 2);
+              //total = truncateDecimals(total * 0.8, 2);
+            }
+            if (license_type != "single" && interval_type == "monthly") {
+              $("#averageCost").html(
+                monitize(main_total / (total_amount / 12))
+              );
+            } else {
+              $("#averageCost").html(monitize(main_total / total_amount));
+            }
+
+            //$('#averageCost').html(monitize(main_total/total_amount));
+            $("#totalPrice").html(monitize(main_total));
+            if (license_type == "single" && $("#number_seats").val() > 10000) {
+              $("#costDisplay").hide();
+              $("#costQuote").show();
+              $("#plan_tier_table").append(
+                '<tr style="font-weight:900"><td>Total:</td><td align="right" colspan="4">Call for Custom Pricing</td></tr>'
+              );
+            } else {
+              $("#costQuote").hide();
+              $("#costDisplay").show();
+              $("#plan_tier_table").append(
+                '<tr style="font-weight:900"><td>Sub total:</td><td align="right"></td><td align="left"></td><td align="right"></td><td align="right">' +
+                  monitize(total) +
+                  "</td></tr>"
+              );
+              if (interval_type != "monthly") {
+                $("#plan_tier_table").append(
+                  '<tr style="font-weight:900"><td>Discount:</td><td align="right"></td><td align="left"></td><td align="right"></td><td align="right">' +
+                    "20%" +
+                    "</td></tr>"
+                );
+                $("#plan_tier_table").append(
+                  '<tr style="font-weight:900"><td>Total:</td><td align="right"></td><td align="left"></td><td align="right"></td><td align="right">' +
+                    "$" +
+                    truncateDecimals(total * 0.8, 2) +
+                    "</td></tr>"
+                );
+              }
+            }
+
+            var height = $("#price_right").height();
+            $("#price_height").val(height);
+
+            $("#number_seats").focus();
+          }
+
+          $("#number_seats").on("change click mouseup", setupPricing);
+          $("#target_emails").on("change click mouseup", setupPricing);
+          $(".product-input").on("change click mouseup", setupPricing);
+          $("#currency").on("change", setupPricing);
+          $('input[name="account_license_type"]').on(
+            "change click",
+            function () {
+              switch ($('input[name="account_license_type"]:checked').val()) {
+                case "single":
+                  $("#number_seats").css("display", "block");
+                  $("#target_emails").css("display", "none");
+                  break;
+                case "multi":
+                  $("#number_seats").css("display", "none");
+                  $("#target_emails").css("display", "block");
+                  break;
+              }
+
+              setupPricing();
+            }
+          );
+          $('input[name="account_interval"]').on("change click", setupPricing);
+
+          function truncateDecimals(num, digits) {
+            var numS = num.toString(),
+              decPos = numS.indexOf("."),
+              substrLength = decPos == -1 ? numS.length : 1 + decPos + digits,
+              trimmedResult = numS.substr(0, substrLength),
+              finalResult = isNaN(trimmedResult) ? 0 : trimmedResult;
+
+            return parseFloat(finalResult);
+          }
+
+          function addButton() {
+            window.open(
+              "https://portal.duocircle.com/cart.php?a=add&pid=101&brand=phishprotection",
+              ""
+            );
+          }
+
+          $("#addButton").on("click", addButton);
+        });
+      </script>
+
+      <div
+        class="row"
+        style="display: table; width: 100%; margin-bottom: 25px;"
+      >
+        <div id="price_left" class="col-sm-4 col-xs-12">
+          <div class="row" style="display: none;">
+            <div class="col-xs-12" style="padding-bottom: 15px;">
+              <strong>Type of account?</strong>
+              <label class="radio-inline mr10">
+                <input
+                  type="radio"
+                  name="account_license_type"
+                  value="single"
+                  checked=""
+                />
+                Single Company
+              </label>
+              <label class="radio-inline mr10">
+                <input type="radio" name="account_license_type" value="multi" />
+                Multi-Client
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <strong>Billing interval?</strong><br />
+              <label class="radio-inline mr10">
+                <input type="radio" name="account_interval" value="monthly" />
+                Monthly
+              </label>
+              <label class="radio-inline mr10">
+                <input
+                  type="radio"
+                  name="account_interval"
+                  value="yearly"
+                  checked=""
+                />
+                Yearly
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12" style="padding-top: 15px;">
+              <strong
+                >How many <span class="unit_name">seat</span>s<span
+                  id="span_per_year"
+                  style="display: none;"
+                >
+                  per year</span
+                >?</strong
+              >
+              <input
+                type="number"
+                id="number_seats"
+                name="number_seats"
+                value="25"
+                class="form"
+                style="margin-left: 0px; width: 100%;"
+              />
+              <input
+                type="number"
+                step="500"
+                id="target_emails"
+                name="target_emails"
+                value="6000"
+                class="form"
+                style="margin-left: 0px; width: 100%; display: none;"
+              />
+            </div>
+          </div>
+
+          <div
+            id="price_row"
+            class="row"
+            style="border-top: 1px solid #eeeeee; margin-top: 15px;"
+          >
+            <div class="col-xs-12">
+              <h4 id="costDisplay">
+                Cost: <span id="totalPrice" class="widget-menu">$500.00</span>
+                <small style="color: #999999;">
+                  <span class="interval_disp">/year</span><br />(<span
+                    id="averageCost"
+                    class="widget-menu"
+                    >$20.00</span
+                  >
+                  average cost per <span class="unit_name">seat</span>)
+                </small>
+              </h4>
+              <h4 id="costQuote" style="display: none;">
+                Call for Custom Pricing <br /><small>+1 859-721-0855</small>
+              </h4>
+            </div>
+            <div
+              class="col-xs-12"
+              style="
+                padding-top: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              <button type="button" class="btn btn-primary" id="addButton">
+                Add</button
+              ><select
+                class="form"
+                id="currency"
+                style="float: right; display: block; margin-left: 0px;"
+              >
+                <option value="AUD">AUD A$</option>
+                <option value="BGN">BGN leva</option>
+                <option value="BRL">BRL R$</option>
+                <option value="CAD">CAD CA$</option>
+                <option value="CHF">CHF CHF</option>
+                <option value="CNY">CNY ¥</option>
+                <option value="CZK">CZK Kč</option>
+                <option value="DKK">DKK kr</option>
+                <option value="EUR">EUR €</option>
+                <option value="GBP">GBP £</option>
+                <option value="HKD">HKD HK$</option>
+                <option value="HRK">HRK kn</option>
+                <option value="HUF">HUF Ft</option>
+                <option value="IDR">IDR Rp</option>
+                <option value="ILS">ILS ₪</option>
+                <option value="INR">INR ₹</option>
+                <option value="ISK">ISK kr</option>
+                <option value="JPY">JPY ¥</option>
+                <option value="KRW">KRW ₩</option>
+                <option value="MXN">MXN MX$</option>
+                <option value="MYR">MYR RM</option>
+                <option value="NOK">NOK kr</option>
+                <option value="NZD">NZD NZ$</option>
+                <option value="PHP">PHP ₱</option>
+                <option value="PLN">PLN zł</option>
+                <option value="RON">RON lei</option>
+                <option value="RUB">RUB ₽</option>
+                <option value="SEK">SEK kr</option>
+                <option value="SGD">SGD S$</option>
+                <option value="THB">THB ฿</option>
+                <option value="TRY">TRY ₺</option>
+                <option value="USD" selected="">USD $</option>
+                <option value="ZAR">ZAR R</option>
+              </select>
+            </div>
+            <div
+              id="save20"
+              class="col-xs-12"
+              style="padding-top: 5px; display: none;"
+            >
+              <div
+                style="
+                  background-color: #8cd481;
+                  color: #ffffff;
+                  margin-top: 15px;
+                  padding: 5px 7px;
+                "
+              >
+                You can save 20% by paying yearly.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="price_right" class="col-sm-8 hidden-xs">
+          <table width="100%" class="tbl PricingTable">
+            <thead>
+              <tr>
+                <th style="background: #266cb3; color: white;">
+                  Pricing Tier/Product
+                </th>
+                <th
+                  align="center"
+                  colspan="2"
+                  style="
+                    background: #266cb3;
+                    color: white;
+                    padding: 5px;
+                    text-align: center;
+                  "
+                >
+                  Per <span class="unit_name">seat</span>
+                </th>
+                <th
+                  style="
+                    background: #266cb3;
+                    color: white;
+                    padding: 5px;
+                    text-align: right;
+                  "
+                ></th>
+                <th
+                  align="right"
+                  style="
+                    background: #266cb3;
+                    color: white;
+                    padding: 5px;
+                    text-align: right;
+                  "
+                >
+                  Sub Total
+                </th>
+              </tr>
+            </thead>
+            <tbody id="plan_tier_table">
+              <tr style="background-color: #fffbcc;">
+                <td>1-25</td>
+                <td align="right">-</td>
+                <td align="left">x 25</td>
+                <td></td>
+                <td align="right">$600.00</td>
+              </tr>
+              <tr>
+                <td>26-50</td>
+                <td align="right">$13.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>51-100</td>
+                <td align="right">$11.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>101-250</td>
+                <td align="right">$9.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>251-500</td>
+                <td align="right">$7.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>501-1000</td>
+                <td align="right">$6.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>1001-2000</td>
+                <td align="right">$6.50</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>2001-5000</td>
+                <td align="right">$5.00</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>5001-10000</td>
+                <td align="right">$3.50</td>
+                <td align="left">x 0</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">+</td>
+                <td align="right" style="border-bottom: 1px solid #aaa;">
+                  $0.00
+                </td>
+              </tr>
+              <tr>
+                <td>10001+</td>
+                <td align="right" colspan="4">Call for Custom Pricing</td>
+              </tr>
+              <tr style="font-weight: 900;">
+                <td>Total:</td>
+                <td align="right"></td>
+                <td align="left"></td>
+                <td align="right"></td>
+                <td align="right">$600.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+
+    <script type="text/javascript">
+      // Custom styling can be passed to options when creating an Element.
+      // (Note that this demo uses a wider set of styles than the guide below.)
+      var style = {
+        base: {
+          color: "#32325d",
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSmoothing: "antialiased",
+          fontSize: "16px",
+          "::placeholder": {
+            color: "#aab7c4",
+          },
+        },
+        invalid: {
+          color: "#fa755a",
+          iconColor: "#fa755a",
+        },
+      };
+    </script>
+  </body>
+</html>

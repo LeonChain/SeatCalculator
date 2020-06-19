@@ -1,0 +1,6 @@
+projectKey=PricingCalculator
+serverUrl=http://192.168.1.226:9000
+serverVersion=8.3.1.34397
+dashboardUrl=http://192.168.1.226:9000/dashboard?id=PricingCalculator
+ceTaskId=AXLKllaU1xXEW2UJQgoW
+ceTaskUrl=http://192.168.1.226:9000/api/ce/task?id=AXLKllaU1xXEW2UJQgoW
